@@ -60,7 +60,7 @@ Code (C++):
 // (+) --------------------------------|
 // #isUnique(string)
 // ------------------------------------|
-// Desc:    Default constructor for the Shop class
+// Desc:    Determines whether a string contains a repeat or not
 // Params:  string arg1 - The string received
 // PreCons: None
 // PosCons: None
