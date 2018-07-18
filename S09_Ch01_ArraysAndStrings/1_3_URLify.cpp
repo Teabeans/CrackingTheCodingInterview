@@ -8,61 +8,43 @@
 // Modified: 2018.07.15
 //
 
-NOTE: PLACEHOLDER DOCUMENT! TODO: Complete problem
-
 /*
-1.2 - CheckPermutation() - P.90
-Given two strings, write a method to decide if one is a permutation of the other.
+1.3 - URLify() - P.90
+Write a method to replace all spaces in a string with "%20". You may assume that the string has sufficient space at the end to hold the additional characters, and that you are given the "true" length of the string. (Note: If implementing in Java, please use a character array so that you can perform this operation in place.)
+
+Example:
+Input:  "Mr John Smith    ", 13
+Output: "Mr%20John%20Smith"
 
 Problem Setup and Assumptions:
   A string may be represented as an array or linked list of chars.
     Many languages also support the string as a class
-  A permutation is a rearrangement of characters in a string.
+  The input format provides sufficient whitespace at the end to expand the string appropriately
+  The input may or may not have a valid trailing whitespace ('%20')
 
 Naive Approach:
-  Compare all permutations of one string against the other for equivalence.
-  The time complexity may be represented by the number of comparisons required based on N, the length of the strings.
-  As a string of length N will in the worst case require a quantity of comparisons matching the number of permutations available, the pattern will be as follows:
-    (1) char  == 1 combination  (a)
-    (2) chars == 2 combinations (ab, ba)
-    (3) chars == 6 combinations (abc, acb, bac, bca, cab, cba)
-  More broadly, we may say that the number of combinations is factorial in nature:
-  O(N!)
-  1 * 2 * 3 ... * n
-  However, this only represents the number of string comparisons to perform. As such comparisons are char-by-char comparisons down the string, we may expect a time complexity closer to:
-  O(N! * N)
-  Note that this ignores issues of repeated characters or discussions of alphabet size.
+  Generate an empty string and a counter.
+  Traverse the provided string from left to right, decrementing the counter for every character.
+  At every character, copy from the provided string to the new string.
+  If the character to copy is a whitespace, however, copy "%20" instead.
+  When the counter reaches (0), all valid characters have been handled.
 
 Optimizations:
-  1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
-  2) Sorting the two strings (an O(NlogN) operation) may allow us to traverse the sorted strings char-by-char looking for discrepancies.
-    - To be permutations, the quantity of all characters must be the same
-    - So if a mismatch is found in the sorted sequence, the quantities differ and the strings cannot be permutations of each other
-  3) However, since we only require a count of the characters involved, we can avoid sorting the strings and merely take a tally
-    - 2 tables will be required representing the frequency of characters within each string
-    - After traversing the string to populate these frequency tables, we can compare the tables for discrepancies
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - O(A) to traverse the frequency table (where A represent the length of the alphabet)
-    - This has the additional advantage that the strings need not be modified or copied
-  4) A single frequency table may be used by counting up for the first string, then down for the second. This yields a couple advantages:
-    - A slight improvement to memory requirements of the frequency table, as only one alphabet need be stored.
-    - The algorithm may shortcut its comparisons if the decrement value ever drops below 0 (representing more of that character in the second string than the first)
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - Which simplifies to an O(N) time complexity for this solution
+  1) The naive solution, while O(N) fast, requires memory overhead equal to the length of the string. A memory optimization in this regard might be realized by shuffling the original string in situ, though it bears mention that if the intended use of this method is for URL strings, the optimization here will be slight.
+    - This may be achieved by traversing the original string from right (end) to left (beginning) and using two pointers; one for the current character being read and another for the current character being written.
+    - The time complexity shall remain O(N)
+  2) If no write operations are possible (that is, the length of the string matches the provided length argument), then the algorithm may be shortcutted
+  3) If no further write operations are possible (that is, the write pointer has "caught up" to the read pointer), then the algorithm is complete. Full string processing may be only rarely expected where strings begin with whitespaces.
 
 Pseudo Logic:
-  Compare string lengths for equality
-  Declare alphabet table charCounts
-  For each character in string1
-    Add 1 to the appropriate table in charCounts
-  For each character in string2
-    Subtract 1 from the appropriate table in charCounts
-    If the result is <0
-      Return false
+  Set the current read pointer to the last letter of the string
+  Set the current write pointer to the end of the string
+  Fencepost problem:
+  - If the pointers are equal, return the string without modification
+  Begin loop behavior:
+  - Otherwise, read the character from the read pointer into the write pointer's location and advance it one to the left.
+  - Unless it's a whitespace, in which case, write "%20" into the next three write positions, advancing the write pointer leftward
+  - If the pointers are equal, return the string (no further whitespaces are expected in the string)
 
 Code (C++):
 */
@@ -70,48 +52,21 @@ Code (C++):
 #include <string>
 
 // (+) --------------------------------|
-// #checkPermutations(string)
+// #URLify(string, int)
 // ------------------------------------|
-// Desc:    Determines whether two strings are permutations of one another or not
-// Params:  string arg1 - The first string to compare
-//          string arg2 - The second string to compare
-// PreCons: None
-// PosCons: None
-// RetVal:  bool true - The received strings are permutations of each other
-//          bool false - The received strings are not permutations of each other
-bool checkPermutations(string string1, string string2) {
-   // Compare string lengths for equality
-   if ( string1.length( ) != string2.length( ) {
-      return( false );
-   }
-
-   // Declare and initialize alphabet table charCounts
-   int charCounts[256];
-   for ( int i = 0 ; i < 256 ; i++ ) {
-      charCounts[i] = 0;
-   }
-
-   // For each character in string1
-   char currChar;
-   for ( int i = 0 ; i < string1.length( ) ; i++ ) {
-      // Add 1 to the appropriate table in charCounts
-      currChar = string1.at( i );
-      charCounts[ (int)currChar ] += 1;
-   } // Closing for - Frequency table loaded
-
-   // For each character in string2
-   for ( int i = 0 ; i < string2.length( ) ; i++ ) {
-      // Subtract 1 from the appropriate table in charCounts
-      currChar = string2.at( i );
-      charCounts[ (int)currChar ] -= 1;
-
-      // If the result is <0
-      if ( charCounts[ (int)currChar ] < 0 ) {
-         // Return false
-         return( false );
-      }
-   } // Closing for - All comparisons performed
-
-   // No discrepancies found in the two strings, so...
-   return( true );
+// Desc:    Converts a string to its URL appropriate format (whitespaces replaced with '%20')
+// Params:  string arg1 - The string to modify
+//          int arg2 - The number of valid characters in the string
+// PreCons: The string contains sufficient whitespace at its end to accomodate its alteration
+// PosCons: The string has been modified
+// RetVal:  void - The string is modified in situ, nothing is returned
+void URLify(&string theString, int argLength) {
+  // Set the current read pointer to the last letter of the string
+  // Set the current write pointer to the end of the string
+  // Fencepost problem:
+  // - If the pointers are equal, return the string without modification
+  // Begin loop behavior:
+  // - Otherwise, read the character from the read pointer into the write pointer's location and advance it one to the left.
+  // - Unless it's a whitespace, in which case, write "%20" into the next three write positions, advancing the write pointer leftward
+  // - If the pointers are equal, return the string (no further whitespaces are expected in the string)
 }
