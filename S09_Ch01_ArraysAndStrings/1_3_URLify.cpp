@@ -61,12 +61,25 @@ Code (C++):
 // PosCons: The string has been modified
 // RetVal:  void - The string is modified in situ, nothing is returned
 void URLify(&string theString, int argLength) {
-  // Set the current read pointer to the last letter of the string
-  // Set the current write pointer to the end of the string
-  // Fencepost problem:
-  // - If the pointers are equal, return the string without modification
-  // Begin loop behavior:
-  // - Otherwise, read the character from the read pointer into the write pointer's location and advance it one to the left.
-  // - Unless it's a whitespace, in which case, write "%20" into the next three write positions, advancing the write pointer leftward
-  // - If the pointers are equal, return the string (no further whitespaces are expected in the string)
+   // Set the current read pointer to the last letter of the string (subtract 1 for difference between size and index)
+   int readPos = argLength - 1;
+   // Set the current write pointer to the end of the string (subtract 1 for difference between size and index)
+   int writePos = theString.length() - 1;
+
+   // Fencepost problem:
+   // - If the pointers are equal, return the string without modification
+   if (readPos == writePos) {
+      return;
+   }
+
+   // Begin loop behavior:
+   char currChar;
+   while (true) {
+      currChar = theString.at(readPos);
+      // - Otherwise, read the character from the read pointer into the write pointer's location and advance it one to the left.
+      theString[writePos] = theString.at(readPos);
+      readPos--;
+      // - Unless it's a whitespace, in which case, write "%20" into the next three write positions, advancing the write pointer leftward
+      // - If the pointers are equal, return the string (no further whitespaces are expected in the string)
+   }
 }
