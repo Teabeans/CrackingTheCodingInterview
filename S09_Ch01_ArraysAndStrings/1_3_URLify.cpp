@@ -60,26 +60,41 @@ Code (C++):
 // PreCons: The string contains sufficient whitespace at its end to accomodate its alteration
 // PosCons: The string has been modified
 // RetVal:  void - The string is modified in situ, nothing is returned
-void URLify(&string theString, int argLength) {
+void URLify( &string theString, int argLength ) {
    // Set the current read pointer to the last letter of the string (subtract 1 for difference between size and index)
    int readPos = argLength - 1;
    // Set the current write pointer to the end of the string (subtract 1 for difference between size and index)
-   int writePos = theString.length() - 1;
+   int writePos = theString.length( ) - 1;
 
    // Fencepost problem:
-   // - If the pointers are equal, return the string without modification
-   if (readPos == writePos) {
+   // If the pointers are equal, return the string without modification
+   if ( readPos == writePos ) {
       return;
    }
 
-   // Begin loop behavior:
    char currChar;
-   while (true) {
-      currChar = theString.at(readPos);
-      // - Otherwise, read the character from the read pointer into the write pointer's location and advance it one to the left.
-      theString[writePos] = theString.at(readPos);
+   // Begin loop behavior:
+   while ( true ) {
+      currChar = theString.at( readPos );
       readPos--;
-      // - Unless it's a whitespace, in which case, write "%20" into the next three write positions, advancing the write pointer leftward
+      // Read normal characters from the read pointer into the write pointer's location and advance them one to the left.
+      if ( currChar != ' ' ) {
+         theString[ writePos ] = currChar;
+         writePos--;
+      }
+      // But if it's a whitespace write "%20" into the next three write positions, advancing the write pointer leftward
+      else if ( currChar == ' ' ) {
+         theString[ writePos ] = '0';
+         writePos--;
+         theString[ writePos ] = '2';
+         writePos--;
+         theString[ writePos ] = '%';
+         writePos--;
+      }
+
       // - If the pointers are equal, return the string (no further whitespaces are expected in the string)
-   }
-}
+      if ( readPos == writePos ) {
+          return( );
+      }
+   } // Closing while - All characters handled up to the left-most whitespace
+} // Closing URLify()
