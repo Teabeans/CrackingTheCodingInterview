@@ -4,65 +4,67 @@
 //
 // Tim Lum
 // twhlum@gmail.com
-// Created:  2018.07.15
-// Modified: 2018.07.15
+// Created:  2018.07.23
+// Modified: 2018.07.23
 //
 
-NOTE: PLACEHOLDER DOCUMENT! TODO: Complete problem
-
 /*
-1.2 - CheckPermutation() - P.90
-Given two strings, write a method to decide if one is a permutation of the other.
+1.4 - Palindrome Permutation() - P.91
+Given a string, write a function to check if it is a permutation of a palindrome. A palindrome is a word or phrase that is the same forwards and backwards. A permutation is a rearrangement of letters. The palindrome does not need to be limited to just dictionary words.
+
+Example:
+Input: Tact Coa
+Output: True (permutations: "taco cat", "atco cta", etc.)
 
 Problem Setup and Assumptions:
   A string may be represented as an array or linked list of chars.
     Many languages also support the string as a class
   A permutation is a rearrangement of characters in a string.
+  A palindrome reads the same forward as backward
+   - Ignoring case
+   - Ignoring whitespace
+  Assume valid chars from a-z and A-Z
+
+Terribad approach:
+  Generate all permutations of the string
+  Check each permutation for palindromic qualities by iterating from the front and back of the string
+  Return false if all permutations are exhausted without finding a palindrome
+  Return true if a palindrome is encountered
 
 Naive Approach:
-  Compare all permutations of one string against the other for equivalence.
-  The time complexity may be represented by the number of comparisons required based on N, the length of the strings.
-  As a string of length N will in the worst case require a quantity of comparisons matching the number of permutations available, the pattern will be as follows:
-    (1) char  == 1 combination  (a)
-    (2) chars == 2 combinations (ab, ba)
-    (3) chars == 6 combinations (abc, acb, bac, bca, cab, cba)
-  More broadly, we may say that the number of combinations is factorial in nature:
-  O(N!)
-  1 * 2 * 3 ... * n
-  However, this only represents the number of string comparisons to perform. As such comparisons are char-by-char comparisons down the string, we may expect a time complexity closer to:
-  O(N! * N)
-  Note that this ignores issues of repeated characters or discussions of alphabet size.
+
+
+Better Approach:
+  Observe that the palindromic quality is really a description of character counts. Palindromes:
+    - Have an even number of every character
+    - But +may+ have an odd number of a single character
+  Hence, if all the characters are even in count (except possibly one), then the string can be configured as a palindrome.
 
 Optimizations:
-  1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
-  2) Sorting the two strings (an O(NlogN) operation) may allow us to traverse the sorted strings char-by-char looking for discrepancies.
-    - To be permutations, the quantity of all characters must be the same
-    - So if a mismatch is found in the sorted sequence, the quantities differ and the strings cannot be permutations of each other
-  3) However, since we only require a count of the characters involved, we can avoid sorting the strings and merely take a tally
-    - 2 tables will be required representing the frequency of characters within each string
-    - After traversing the string to populate these frequency tables, we can compare the tables for discrepancies
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - O(A) to traverse the frequency table (where A represent the length of the alphabet)
-    - This has the additional advantage that the strings need not be modified or copied
-  4) A single frequency table may be used by counting up for the first string, then down for the second. This yields a couple advantages:
-    - A slight improvement to memory requirements of the frequency table, as only one alphabet need be stored.
-    - The algorithm may shortcut its comparisons if the decrement value ever drops below 0 (representing more of that character in the second string than the first)
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - Which simplifies to an O(N) time complexity for this solution
+  1) Placing the counts in a hash table will be a faster time complexity than rearranging the native string
+  2) Counting the number of odd characters as the algorithm iterates over the string may save time on short strings OR large alphabets
+    - On longer strings (and shorter alphabets), it will likely be more worthwhile to iterate over the count array after all the counts are tallied.
+  The time complexity shall be:
+    - O(N) to iterate over the string (where N is the length of the input) plus...
+    - O(A) to iterate over the character counts (where A is the length of the valid alphabet)
+    - Formally, O(N + A), though in most cases the alphabet may reasonably be expected not to be the dominant factor, particularly where asmyptotic behavior becomes a consideration.
 
 Pseudo Logic:
-  Compare string lengths for equality
-  Declare alphabet table charCounts
-  For each character in string1
-    Add 1 to the appropriate table in charCounts
-  For each character in string2
-    Subtract 1 from the appropriate table in charCounts
-    If the result is <0
-      Return false
+  Create a hash table of counts, initialize to zero (0)
+
+    A   B   C   ...   X   Y   Z
+  -------------------------------
+  | 0 | 0 | 0 | ... | 0 | 0 | 0 |
+  -------------------------------
+
+  Iterate over the argument string, incrementing the appropriate hash for each character
+
+    A   B   C   ...   X   Y   Z
+  -------------------------------
+  | # | # | # | ... | # | # | # |
+  -------------------------------
+
+  With the count array populated, iterate over it. If more than one odd number is found, the string was not a palindrome permutation.
 
 Code (C++):
 */
@@ -70,48 +72,40 @@ Code (C++):
 #include <string>
 
 // (+) --------------------------------|
-// #checkPermutations(string)
+// #palindromePermutation(string)
 // ------------------------------------|
-// Desc:    Determines whether two strings are permutations of one another or not
-// Params:  string arg1 - The first string to compare
-//          string arg2 - The second string to compare
+// Desc:    Determines whether a string is a permutation of a palindrome
+// Params:  string arg1 - The string to analyze
 // PreCons: None
 // PosCons: None
-// RetVal:  bool true - The received strings are permutations of each other
-//          bool false - The received strings are not permutations of each other
-bool checkPermutations(string string1, string string2) {
-   // Compare string lengths for equality
-   if ( string1.length( ) != string2.length( ) {
-      return( false );
-   }
-
-   // Declare and initialize alphabet table charCounts
+// RetVal:  bool true - The received string is a palindrome permutation
+//          bool false - The received string is not a palindrome permutation
+bool palindromePermutation(string theString) {
+   // Generate a count table and initialize it to 0
    int charCounts[256];
-   for ( int i = 0 ; i < 256 ; i++ ) {
+   for (int i = 0 ; i < 256 ; i++) {
       charCounts[i] = 0;
    }
 
-   // For each character in string1
-   char currChar;
-   for ( int i = 0 ; i < string1.length( ) ; i++ ) {
-      // Add 1 to the appropriate table in charCounts
-      currChar = string1.at( i );
-      charCounts[ (int)currChar ] += 1;
-   } // Closing for - Frequency table loaded
+   // Iterate over the string, incrementing the charCounts table
+   char currCharIndex;
+   for ( int i = 0 ; i < theString.length() ; i++ ) {
+      currCharIndex = (int)theString.at(i);
+      charCounts[currCharIndex]++;
+   }
 
-   // For each character in string2
-   for ( int i = 0 ; i < string2.length( ) ; i++ ) {
-      // Subtract 1 from the appropriate table in charCounts
-      currChar = string2.at( i );
-      charCounts[ (int)currChar ] -= 1;
-
-      // If the result is <0
-      if ( charCounts[ (int)currChar ] < 0 ) {
-         // Return false
-         return( false );
+   // Iterate over the charCounts table and inventory how many odd character counts were found
+   int oddsEncountered = 0;
+   for ( int i = 0 ; i < 256 ; i++ ) {
+      if (charCounts[i] % 2 != 0) {
+         oddsEncountered++;
+         // Check if this is or is not the first odd value encountered
+         if (oddsEncountered > 1) {
+            return (false);
+         }
       }
-   } // Closing for - All comparisons performed
+   } // Closing for - all counts checked
 
-   // No discrepancies found in the two strings, so...
-   return( true );
-}
+   // Not more than one odd count was encountered, therefore...
+   return (true);
+} // Closing palindromePermutation(string)
