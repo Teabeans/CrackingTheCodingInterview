@@ -4,65 +4,86 @@
 //
 // Tim Lum
 // twhlum@gmail.com
-// Created:  2018.07.15
-// Modified: 2018.07.15
+// Created:  2018.07.23
+// Modified: 2018.07.23
 //
 
-NOTE: PLACEHOLDER DOCUMENT! TODO: Complete problem
-
 /*
-1.2 - CheckPermutation() - P.90
-Given two strings, write a method to decide if one is a permutation of the other.
+1.5 - OneAway() - P.91
+There are three types of edits that can be performed on strings: insert a character, remove a character, or replace a character. Given two strings, write a function to check if they are one edit (or zero edits) away.
 
 Problem Setup and Assumptions:
   A string may be represented as an array or linked list of chars.
     Many languages also support the string as a class
-  A permutation is a rearrangement of characters in a string.
+  In the case of zero edits:
+    - The string length and contents must be the same
+  In the case of an insertion or removal:
+    - The lengths will differ by one
+      - If it is longer, only one character may differ
+      - If it is shorter, only one character may differ
+  In the case of a replacement:
+    - The lengths must be the same, but one character may differ
 
 Naive Approach:
-  Compare all permutations of one string against the other for equivalence.
-  The time complexity may be represented by the number of comparisons required based on N, the length of the strings.
-  As a string of length N will in the worst case require a quantity of comparisons matching the number of permutations available, the pattern will be as follows:
-    (1) char  == 1 combination  (a)
-    (2) chars == 2 combinations (ab, ba)
-    (3) chars == 6 combinations (abc, acb, bac, bca, cab, cba)
-  More broadly, we may say that the number of combinations is factorial in nature:
-  O(N!)
-  1 * 2 * 3 ... * n
-  However, this only represents the number of string comparisons to perform. As such comparisons are char-by-char comparisons down the string, we may expect a time complexity closer to:
-  O(N! * N)
-  Note that this ignores issues of repeated characters or discussions of alphabet size.
+  Write a series of if-then switches to determine the length of the strings
+    Then determine the nature of the difference
 
 Optimizations:
-  1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
-  2) Sorting the two strings (an O(NlogN) operation) may allow us to traverse the sorted strings char-by-char looking for discrepancies.
-    - To be permutations, the quantity of all characters must be the same
-    - So if a mismatch is found in the sorted sequence, the quantities differ and the strings cannot be permutations of each other
-  3) However, since we only require a count of the characters involved, we can avoid sorting the strings and merely take a tally
-    - 2 tables will be required representing the frequency of characters within each string
-    - After traversing the string to populate these frequency tables, we can compare the tables for discrepancies
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - O(A) to traverse the frequency table (where A represent the length of the alphabet)
-    - This has the additional advantage that the strings need not be modified or copied
-  4) A single frequency table may be used by counting up for the first string, then down for the second. This yields a couple advantages:
-    - A slight improvement to memory requirements of the frequency table, as only one alphabet need be stored.
-    - The algorithm may shortcut its comparisons if the decrement value ever drops below 0 (representing more of that character in the second string than the first)
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - Which simplifies to an O(N) time complexity for this solution
+  - Observing that the prefix and suffix of the edit must be the same
+    - We may iterate from both the front and the rear of the string to determine where the delta occurs
+    - If more than one delta is observed, then we must be more than one edit away
+
+    Scanning from front and back for 2 or more edits case:
+    A B C D E F G
+    A B X X E F G
+    ^           ^ - Start at front and end
+        ^ ^       - Deltas found at index 2 and 3, more than 1 delta detected
+
+    Scanning from front for removal case:
+    A B C D E F G
+    A B D E F G
+        ^ == Index 2
+
+    Scanning from back for removal case:
+    A B C D E F G
+      A B D E F G
+        ^ == Index 2
+
+    Delta detected at index 2 (front) and 2 (rear) - therefore one change
+
+    Scanning from front for insertion case (note that an insertion is the same as removal, but flipped)
+    A B C D E F G
+    A B C X D E F G
+          ^ == Index 3
+
+    Scanning from back for insertion case
+      A B C D E F G
+    A B C X D E F G
+          ^ == Index 3
+
+    Delta detected at index 3 (front) and 3 (rear) - therefore one change
+
+    Scanning from front for replacement case
+    A B C D E F G
+    A B C X E F G
+          ^ == Index 3
+
+    Scanning from back for replacement case
+    A B C D E F G
+    A B C X E F G
+          ^ == Index 3
+
+    Delta detected at index 3 (front) and 3 (rear), therefore one change
 
 Pseudo Logic:
-  Compare string lengths for equality
-  Declare alphabet table charCounts
-  For each character in string1
-    Add 1 to the appropriate table in charCounts
-  For each character in string2
-    Subtract 1 from the appropriate table in charCounts
-    If the result is <0
-      Return false
+  Compare string lengths for equivalence (+/- 1)
+  If the strings differ, label the longer and shorter
+  If the strings do not differ, arbitrarily label the longer and shorter
+    Scan the two strings from the front and back, searching for a delta
+  Compare the delta locations
+    If the front and rear deltas match, return true
+    Otherwise return false
+
 
 Code (C++):
 */
@@ -70,48 +91,61 @@ Code (C++):
 #include <string>
 
 // (+) --------------------------------|
-// #checkPermutations(string)
+// #OneAway(string, string)
 // ------------------------------------|
-// Desc:    Determines whether two strings are permutations of one another or not
+// Desc:    Determines whether two strings are a single edit away from each other or not
 // Params:  string arg1 - The first string to compare
 //          string arg2 - The second string to compare
 // PreCons: None
 // PosCons: None
-// RetVal:  bool true - The received strings are permutations of each other
-//          bool false - The received strings are not permutations of each other
-bool checkPermutations(string string1, string string2) {
-   // Compare string lengths for equality
-   if ( string1.length( ) != string2.length( ) {
+// RetVal:  bool true - The received strings are one (or zero) edits away from each other
+//          bool false - The received strings are more than one edit from each other
+bool OneAway(string string1, string string2) {
+   // If the absolute difference between string1 and string2 is 2 or greater
+   if ( |(string1.length( ) - string2.length( )| ) >= 2 ) {
+      // No single edit could yield this, therefore...
       return( false );
    }
 
-   // Declare and initialize alphabet table charCounts
-   int charCounts[256];
-   for ( int i = 0 ; i < 256 ; i++ ) {
-      charCounts[i] = 0;
+   // Otherwise
+   string longer;
+   string shorter;
+   if (string1.length() >= string2.length()) { // Note: Includes the equality case
+      longer = string1;
+      shorter = string2;
+   }
+   else {
+      longer = string2;
+      shorter = string1;
    }
 
-   // For each character in string1
-   char currChar;
-   for ( int i = 0 ; i < string1.length( ) ; i++ ) {
-      // Add 1 to the appropriate table in charCounts
-      currChar = string1.at( i );
-      charCounts[ (int)currChar ] += 1;
-   } // Closing for - Frequency table loaded
-
-   // For each character in string2
-   for ( int i = 0 ; i < string2.length( ) ; i++ ) {
-      // Subtract 1 from the appropriate table in charCounts
-      currChar = string2.at( i );
-      charCounts[ (int)currChar ] -= 1;
-
-      // If the result is <0
-      if ( charCounts[ (int)currChar ] < 0 ) {
-         // Return false
-         return( false );
+   // Begin traversing the strings looking for differences
+   int deltaFront;
+   int deltaRear;
+   // Comparison from front
+   for (int i = 0 ; i < shorter.length() ; i++) {
+      if (longer.at(i) != shorter.at(i)) {
+         deltaFront = i;
       }
-   } // Closing for - All comparisons performed
+   }
 
-   // No discrepancies found in the two strings, so...
-   return( true );
-}
+   // Comparison from rear
+   int shortIndex;
+   int longIndex;
+   for (int i = 0 ; i < shorter.length() ; i++ ) {
+      shortIndex = shorter.length() - i;
+      longIndex = longer.length() - i;
+      if (longer.at(longIndex) != shorter.at(shortIndex) {
+         deltaRear = longIndex;
+      }
+   }
+
+   // Delta location from front and rear acquired
+
+   if (deltaFront != deltaRear) {
+      return (false);
+   }
+   // Otherwise...
+   return (true);
+
+} // Closing OneAway()
