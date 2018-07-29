@@ -5,33 +5,23 @@
 // Tim Lum
 // twhlum@gmail.com
 // Created:  2018.07.15
-// Modified: 2018.07.15
+// Modified: 2018.07.29
 //
 
-NOTE: PLACEHOLDER DOCUMENT! TODO: Complete problem
-
 /*
-1.2 - CheckPermutation() - P.90
-Given two strings, write a method to decide if one is a permutation of the other.
+1.6 - StringCompression() - P.91
+Implement a method to perform basic string compression using the counts of
+repeated characters. For example, the string 'aabcccccaaa' would become
+'a2b1c5a3'. If the "compressed" string would not become smaller than the
+original string, your method should return the original string. You can assume
+the string has only uppercase and lowercase letters (a-z)
 
 Problem Setup and Assumptions:
   A string may be represented as an array or linked list of chars.
     Many languages also support the string as a class
-  A permutation is a rearrangement of characters in a string.
+  Capital letters are not equivalent to lowercase letters ('A' != 'a')
 
 Naive Approach:
-  Compare all permutations of one string against the other for equivalence.
-  The time complexity may be represented by the number of comparisons required based on N, the length of the strings.
-  As a string of length N will in the worst case require a quantity of comparisons matching the number of permutations available, the pattern will be as follows:
-    (1) char  == 1 combination  (a)
-    (2) chars == 2 combinations (ab, ba)
-    (3) chars == 6 combinations (abc, acb, bac, bca, cab, cba)
-  More broadly, we may say that the number of combinations is factorial in nature:
-  O(N!)
-  1 * 2 * 3 ... * n
-  However, this only represents the number of string comparisons to perform. As such comparisons are char-by-char comparisons down the string, we may expect a time complexity closer to:
-  O(N! * N)
-  Note that this ignores issues of repeated characters or discussions of alphabet size.
 
 Optimizations:
   1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
