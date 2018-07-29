@@ -5,8 +5,11 @@
 // Tim Lum
 // twhlum@gmail.com
 // Created:  2018.07.23
-// Modified: 2018.07.23
+// Modified: 2018.07.29
 //
+
+// TODO: Investigate use of a boolean isEven/isOdd toggle. Investigate use of
+// oddCount to avoid iterating over the count the alphabet
 
 /*
 1.4 - Palindrome Permutation() - P.91
