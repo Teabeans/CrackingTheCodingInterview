@@ -62,25 +62,15 @@ Return the new (compressed) string.
 // OPTIMIZATIONS
 //-----------------------------------------------------------------------------|
 
-1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
-  2) Sorting the two strings (an O(NlogN) operation) may allow us to traverse the sorted strings char-by-char looking for discrepancies.
-    - To be permutations, the quantity of all characters must be the same
-    - So if a mismatch is found in the sorted sequence, the quantities differ and the strings cannot be permutations of each other
-  3) However, since we only require a count of the characters involved, we can avoid sorting the strings and merely take a tally
-    - 2 tables will be required representing the frequency of characters within each string
-    - After traversing the string to populate these frequency tables, we can compare the tables for discrepancies
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - O(A) to traverse the frequency table (where A represent the length of the alphabet)
-    - This has the additional advantage that the strings need not be modified or copied
-  4) A single frequency table may be used by counting up for the first string, then down for the second. This yields a couple advantages:
-    - A slight improvement to memory requirements of the frequency table, as only one alphabet need be stored.
-    - The algorithm may shortcut its comparisons if the decrement value ever drops below 0 (representing more of that character in the second string than the first)
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - Which simplifies to an O(N) time complexity for this solution
+1) Store the string length as an O(1) accessible field
+2) Store the string as a char array, allowing O(1) access to any char position
+   a) If the string is a Linked List, then any appendation runs in O(N) time
+   b) With order N append actions to perform, this becomes O(N^2) time
+3) Store the sequence, character, and count to a hash array
+   a) Records all data needed for compression on first (validation) pass
+   b) Prevents us from having to read the original string again
+   c) Allows us to write the new string in situ over the old string
+
 
 
 //-----------------------------------------------------------------------------|
