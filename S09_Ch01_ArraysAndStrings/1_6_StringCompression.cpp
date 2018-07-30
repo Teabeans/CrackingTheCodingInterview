@@ -16,15 +16,53 @@ repeated characters. For example, the string 'aabcccccaaa' would become
 original string, your method should return the original string. You can assume
 the string has only uppercase and lowercase letters (a-z)
 
-Problem Setup and Assumptions:
-  A string may be represented as an array or linked list of chars.
-    Many languages also support the string as a class
-  Capital letters are not equivalent to lowercase letters ('A' != 'a')
 
-Naive Approach:
 
-Optimizations:
-  1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
+//-----------------------------------------------------------------------------|
+// PROBLEM SETUP AND ASSUMPTIONS
+//-----------------------------------------------------------------------------|
+
+A string may be represented as an array or linked list of chars.
+  Many languages also support the string as a class
+Capital letters are not equivalent to lowercase letters ('A' != 'a')
+
+
+
+//-----------------------------------------------------------------------------|
+// NAIVE, BRUTE FORCE, TERRIBAD APPROACH
+//-----------------------------------------------------------------------------|
+
+First determine whether a compression action is beneficial.
+  This may be accomplished by:
+    Generating a cost-to-compress counter
+    Iterate over the string in O(N) time
+    For every lone char (lacking repeats), add 1 to the compression cost
+    For every pair of chars, do not change the cost-to-compress counter
+    For every set of chars from 3 to 9, subtract 1-7 from the counter
+      ie. - 9c saves 7 characters from 'ccccccccc'
+    For every set of chars from 10 to 99, subtract 7-96 from the counter
+      ie. - 99c saves 96 characters from 'ccc...ccc'
+    For every set of chars from 100 to 999, subtract 96-995
+      ie. - 999c saves 995 characters from 'ccc...ccc'
+  If the length of the string is known a priori:
+    Then this counting method may be bypassed if the compression savings
+    exceed the remaining characters in the string + 1
+      ie. If we have determined that we can save 5 characters and there are
+      only 4 characters left, even if the remaining 4 chars are singles,
+      they cannot make the final string length greater than or equal to
+      the original string length.
+After this determination is made, iterate over the string again in O(N) time to:
+  Count how many repeats of a char appear together
+  Append the number of counts plus the char to a new string
+Return the new (compressed) string.
+
+
+
+//-----------------------------------------------------------------------------|
+// OPTIMIZATIONS
+//-----------------------------------------------------------------------------|
+
+1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
   2) Sorting the two strings (an O(NlogN) operation) may allow us to traverse the sorted strings char-by-char looking for discrepancies.
     - To be permutations, the quantity of all characters must be the same
     - So if a mismatch is found in the sorted sequence, the quantities differ and the strings cannot be permutations of each other
@@ -44,8 +82,18 @@ Optimizations:
       - O(N) to traverse the second string
       - Which simplifies to an O(N) time complexity for this solution
 
-Pseudo Logic:
-  Compare string lengths for equality
+
+//-----------------------------------------------------------------------------|
+// TIME COMPLEXITY
+//-----------------------------------------------------------------------------|
+
+
+
+//-----------------------------------------------------------------------------|
+// PSEUDO LOGIC
+//-----------------------------------------------------------------------------|
+
+Compare string lengths for equality
   Declare alphabet table charCounts
   For each character in string1
     Add 1 to the appropriate table in charCounts
@@ -54,7 +102,13 @@ Pseudo Logic:
     If the result is <0
       Return false
 
-Code (C++):
+
+
+
+
+//-----------------------------------------------------------------------------|
+// CODE (C++)
+//-----------------------------------------------------------------------------|
 */
 
 #include <string>
