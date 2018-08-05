@@ -77,20 +77,15 @@ Return the new (compressed) string.
 // TIME COMPLEXITY
 //-----------------------------------------------------------------------------|
 
+O(N) - Successful completion of the task should be achievable in one or two
+passes across the string.
+
 
 
 //-----------------------------------------------------------------------------|
 // PSEUDO LOGIC
 //-----------------------------------------------------------------------------|
 
-Compare string lengths for equality
-  Declare alphabet table charCounts
-  For each character in string1
-    Add 1 to the appropriate table in charCounts
-  For each character in string2
-    Subtract 1 from the appropriate table in charCounts
-    If the result is <0
-      Return false
 
 
 
@@ -104,48 +99,32 @@ Compare string lengths for equality
 #include <string>
 
 // (+) --------------------------------|
-// #checkPermutations(string)
+// #stringCompression(string)
 // ------------------------------------|
-// Desc:    Determines whether two strings are permutations of one another or not
-// Params:  string arg1 - The first string to compare
-//          string arg2 - The second string to compare
+// Desc:    Compresses a string if doing so would be beneficial, otherwise
+//          returns string unaltered
+// Params:  string arg1 - The string to compress
 // PreCons: None
-// PosCons: None
-// RetVal:  bool true - The received strings are permutations of each other
-//          bool false - The received strings are not permutations of each other
-bool checkPermutations(string string1, string string2) {
-   // Compare string lengths for equality
-   if ( string1.length( ) != string2.length( ) {
-      return( false );
-   }
-
-   // Declare and initialize alphabet table charCounts
-   int charCounts[256];
-   for ( int i = 0 ; i < 256 ; i++ ) {
-      charCounts[i] = 0;
-   }
-
-   // For each character in string1
-   char currChar;
-   for ( int i = 0 ; i < string1.length( ) ; i++ ) {
-      // Add 1 to the appropriate table in charCounts
-      currChar = string1.at( i );
-      charCounts[ (int)currChar ] += 1;
-   } // Closing for - Frequency table loaded
-
-   // For each character in string2
-   for ( int i = 0 ; i < string2.length( ) ; i++ ) {
-      // Subtract 1 from the appropriate table in charCounts
-      currChar = string2.at( i );
-      charCounts[ (int)currChar ] -= 1;
-
-      // If the result is <0
-      if ( charCounts[ (int)currChar ] < 0 ) {
-         // Return false
-         return( false );
+// PosCons: The string has been compressed (or nothing)
+// RetVal:  string - A compressed string (or not)
+string stringCompression(string theString) {
+   int origLength = theString.length();
+   // Ascertain if a savings would be achieved
+   int savings = 0;
+   int numRepeats = 0;
+   char lastChar = theString.at(0);
+   char currChar = theString.at(1);
+   for ( int i = 1 ; i < origLength ; i++ ) {
+      if (currChar == lastChar) {
+         numRepeats++;
       }
-   } // Closing for - All comparisons performed
-
-   // No discrepancies found in the two strings, so...
-   return( true );
-}
+      else if (currChar != lastChar) {
+         // For 0 repeats (single), cost of 1
+         // For 1 repeat (double), saving of 0
+         // For 2 repeat (triple), saving of 1
+         savings = savings + (numRepeats - 1);
+         // For 9 repeats (10), saving of 7 a10 (3) aaaaaaaaaa (10)
+      }
+   }
+   
+} // Closing stringCompression()
