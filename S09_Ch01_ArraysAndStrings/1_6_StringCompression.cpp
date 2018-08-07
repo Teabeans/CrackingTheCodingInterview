@@ -125,24 +125,68 @@ If compression is worthwhile
 // PreCons: None
 // PosCons: The string has been compressed (or nothing)
 // RetVal:  string - A compressed string (or not)
-string stringCompression(string theString) {
-   int origLength = theString.length();
-   // Ascertain if a savings would be achieved
-   int savings = 0;
-   int numRepeats = 0;
-   char lastChar = theString.at(0);
-   char currChar = theString.at(1);
-   for ( int i = 1 ; i < origLength ; i++ ) {
-      if (currChar == lastChar) {
-         numRepeats++;
+string stringCompression( string theString ) {
+   // No savings can be realized on a string of length 2 or less
+   if (theString.length( ) < 3) {
+      return ( theString );
+   }
+
+   // Pack the string to two arrays
+   // Declare storage
+   char[ ] charSequence = char[ theString.length( ) ];
+   int[ ]  charCount    =  int[ thestring.length( ) ];
+   // Initialize storage
+   for ( int i = 0 ; i < theString.length( ) ; i++ ) {
+      charSequence[ i ] = ( char )0;
+      charCount[ i ] = -1;
+   }
+   // Begin traversing the string
+   int currArrayPos = 0;
+
+   // Fencepost problem
+   char currChar = theString.at( i );
+   int counter = 1;
+   charSequence[ currArrayPos ] = currChar;
+
+   for ( int i = 1 ; i < theString.length( ) ; i++ ) {
+      if ( currChar = theString.at( i ) ) {
+         // Repeat behavior
+         counter++;
       }
-      else if (currChar != lastChar) {
-         // For 0 repeats (single), cost of 1
-         // For 1 repeat (double), saving of 0
-         // For 2 repeat (triple), saving of 1
-         savings = savings + (numRepeats - 1);
-         // For 9 repeats (10), saving of 7 a10 (3) aaaaaaaaaa (10)
+      else if ( currChar != theString.at( i ) ) {
+         // Non-repeat behavior (new char)
+         // Place the count of prior repetitions to the tracking arrays
+         charCount[ currArrayPos ] = counter;
+         currArrayPos++;
+         // Place the new character to the tracking array
+         currChar = theString.at( i );
+         charSequence[ currArrayPos ] = currChar;
+         // And reset the counter
+         counter = 1;
       }
    }
    
+   // String traversed, determine savings
+
+   int savings = countSavings( charCount );
+
+   // If no savings are realized, return the original string
+   if ( savings < 1 ) {
+      return ( theString );
+   }
+
+   // Otherwise, concatenate a new string
+   else if ( savings >= 1 ) {
+      int currPos = 0;
+      string retString = "";
+      int currCount;
+      while ( charSequence[ currPos ] != (char)0 ) {
+         currChar  = charSequence[ currPos ];
+         currCount = charCount[ currPos ];
+         retString = retString + currChar + currCount;
+      } // Closing while - All concatenations complete
+   }
+   // Return the compressed string
+   return ( retString );
+
 } // Closing stringCompression()
