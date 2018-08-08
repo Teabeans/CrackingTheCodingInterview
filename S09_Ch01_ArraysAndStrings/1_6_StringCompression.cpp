@@ -168,7 +168,7 @@ string stringCompression( string theString ) {
    
    // String traversed, determine savings
 
-   int savings = countSavings( charCount );
+   int savings = countSavings( charCount, theString.length() );
 
    // If no savings are realized, return the original string
    if ( savings < 1 ) {
@@ -190,3 +190,28 @@ string stringCompression( string theString ) {
    return ( retString );
 
 } // Closing stringCompression()
+
+int countSavings( int[] charCount, int length ) {
+   // For every element in the count array...
+   int savings = 0;
+   for ( int i = 0 ; i < length ; i++ ) {
+      // If we run off the end of the valid numerics...
+      if ( charCount[ i ] == -1 ) {
+         break;
+      }
+      else {
+         savings = savings + ( charCount[ i ] - 2 );
+         // Calculate further savings reductions for multi-digit sequences
+         int powersOfTen = -1;
+         int temp = charCount[ i ];
+         while ( temp > 0 ) {
+            temp = temp / 10;
+            powersOfTen++;
+         }
+         // Single digits == 0 ; Double digits == 1 ; Triple digits == 2
+         // For every power of ten, subtract one from the savings
+         savings = savings - powersOfTen;
+      }
+   } // Closing for, all valid numerics added correctly to "savings"
+   return ( savings );
+}
