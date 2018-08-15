@@ -5,7 +5,7 @@
 // Tim Lum
 // twhlum@gmail.com
 // Created:  2018.07.15
-// Modified: 2018.07.29
+// Modified: 2018.08.15
 //
 
 /*
@@ -185,14 +185,7 @@ string stringCompression( string theString ) {
 
    // Otherwise, concatenate a new string
    else if ( savings >= 1 ) {
-      int currPos = 0;
-      string retString = "";
-      int currCount;
-      while ( charSequence[ currPos ] != (char)0 ) {
-         currChar  = charSequence[ currPos ];
-         currCount = charCount[ currPos ];
-         retString = retString + currChar + currCount;
-      } // Closing while - All concatenations complete
+      retString = stitchStrings(charSequence, charCount, theString.length());
    }
    // Return the compressed string
    return ( retString );
@@ -222,11 +215,17 @@ int countSavings( int[] charCount, int length ) {
       }
    } // Closing for, all valid numerics added correctly to "savings"
    return ( savings );
-}
+} // Closing countSavings()
 
-char* stitchStrings(char* charSequence, int* charCount, int origLength) {
+string stitchStrings(char* charSequence, int* charCount, int origLength) {
    stringstream tempStream;
    for ( int i = 0 ; i < origLength ; i++ ) {
-      if (charCount[i] == 
-   }
-}
+      // In the event of an invalid char count, stop
+      if (charCount[i] == -1) {
+         break;
+      }
+      // Otherwise, concatenate
+      tempStream << charSequence[i] << charCount[i];
+   } // Closing for - Valid concatenations complete
+   return (tempStream.toString());
+} // Closing stitchStrings()
