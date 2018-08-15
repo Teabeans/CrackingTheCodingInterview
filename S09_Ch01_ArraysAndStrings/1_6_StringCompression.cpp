@@ -78,7 +78,15 @@ Return the new (compressed) string.
       only 4 characters left, even if the remaining 4 chars are singles,
       they cannot make the final string length greater than or equal to
       the original string length.
-
+5) Side note: This problem is an implementation of "Run-Length Encoding".
+  - https://en.wikipedia.org/wiki/Run-length_encoding
+6) If the frequency of a run is 1, the coding system itself may be modified
+   without loss of data by omitting the 1 (ie. "A1" becomes just 'A')
+7) To optimize the string concatenations, some care and investigation is needed
+  - We wish to avoid reallocating the string for every concatenation
+  - Doing so may be a language/compiler specific solution
+  - C-style char array strings may offer one such method to achieve this
+    - Appendations, changes, concatenations are performed in O(1) time
 
 
 //-----------------------------------------------------------------------------|
@@ -214,4 +222,11 @@ int countSavings( int[] charCount, int length ) {
       }
    } // Closing for, all valid numerics added correctly to "savings"
    return ( savings );
+}
+
+char* stitchStrings(char* charSequence, int* charCount, int origLength) {
+   stringstream tempStream;
+   for ( int i = 0 ; i < origLength ; i++ ) {
+      if (charCount[i] == 
+   }
 }
