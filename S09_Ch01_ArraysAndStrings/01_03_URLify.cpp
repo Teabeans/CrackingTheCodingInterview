@@ -117,7 +117,7 @@ string theString
 // PreCons: The string contains sufficient whitespace at its end to accomodate its alteration
 // PosCons: The string has been modified
 // RetVal:  void - The string is modified in situ, nothing is returned
-void URLify( char* theString, int argLength ) {
+std::string URLify( std::string theString, int argLength ) {
    // Set the current read pointer to the last letter of the string (subtract 1 for difference between size and index)
    int readPos = argLength - 1;
    // Set the current write pointer to the end of the string (subtract 1 for difference between size and index)
@@ -126,7 +126,7 @@ void URLify( char* theString, int argLength ) {
    // Fencepost problem:
    // If the pointers are equal, return the string without modification
    if ( readPos == writePos ) {
-      return;
+      return( theString );
    }
 
    char currChar;
@@ -151,7 +151,7 @@ void URLify( char* theString, int argLength ) {
 
       // - If the pointers are equal, return the string (no further whitespaces are expected in the string)
       if ( readPos == writePos ) {
-          return( );
+          return( theString );
       }
    } // Closing while - All characters handled up to the left-most whitespace
 } // Closing URLify()
@@ -172,11 +172,16 @@ void URLify( char* theString, int argLength ) {
 // PosCons: None
 // RetVal:  int - The exit code (0 for normal, -1 for error)
 int main( int argc, char* argv[ ] ) {
-   std::cout << "Test of checkPermutations( )" << std::endl;
-   bool test1 = checkPermutations( "abcdefghijklmnop", "ponmlkjihgfedcba" );
-   bool test2 = checkPermutations( "abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyy" );
-   std::cout << "Test 1 (expected: 1) : " << test1 << std::endl;
-   std::cout << "Test 2 (expected: 0) : " << test2 << std::endl;
+   std::cout << "Test of URLify( )" << std::endl;
+   std::string test1 = URLify( "www.google.com", 14 );
+   std::string test2 = URLify( "www.my site.com  ", 15 );
+   std::string test3 = URLify( "www.sneakiness.com   ", 19 ); // Trailing whitespace
+   std::cout << "Test 1 : ( www.google.com expected )" << std::endl;
+   std::cout << "           " << test1 << std::endl;
+   std::cout << "Test 2 : ( www.my%20site.com expected )" << std::endl;
+   std::cout << "           " << test2 << std::endl;
+   std::cout << "Test 3 : ( www.sneakiness.com%20 expected )" << std::endl;
+   std::cout << "           " << test3 << std::endl;
    return( 0 );
 } // Closing main( int, char* )
 
