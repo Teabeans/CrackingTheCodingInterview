@@ -119,6 +119,7 @@ Otherwise return true.
 
 #include <string>
 #include <iostream>
+#include <ctype.h> // For toupper( )
 
 // (+) --------------------------------|
 // #palindromePermutation(string)
@@ -143,16 +144,25 @@ bool palindromePermutation( std::string theString ) {
    // Iterate over the string, toggling the isEven table
    char currCharIndex;
    for ( int i = 0 ; i < theString.length( ) ; i++ ) {
-      currCharIndex = ( int )theString.at( i );
-      isEven[ currCharIndex ] = !isEven[ currCharIndex ];
-      // If we just switched to an even count...
-      if( isEven[ currCharIndex ] == true ) {
-         oddCounter--;
+
+      // If the character is a whitespace...
+      if( theString.at( i ) == ' ' ) {
+         // Do nothing
       }
       else {
-         oddCounter++;
+         currCharIndex = ( int )toupper( theString.at( i ) );
+         isEven[ currCharIndex ] = !isEven[ currCharIndex ];
+         // If we just switched to an even count...
+         if( isEven[ currCharIndex ] == true ) {
+            oddCounter--;
+         }
+         else {
+            oddCounter++;
+         }
       }
+
    } // Closing for - String has been parsed
+
    // If the oddCounter is 0 or 1, this is permutable
    if( oddCounter <= 1 ) {
       return( true );
@@ -180,7 +190,7 @@ bool palindromePermutation( std::string theString ) {
 // RetVal:  int - The exit code (0 for normal, -1 for error)
 int main( int argc, char* argv[ ] ) {
    std::cout << "Test of palindromePermutation( )" << std::endl;
-   bool test1 = palindromePermutation( "thisisapermutationthisisapermutationz" );
+   bool test1 = palindromePermutation( "THIS is a permutation this is a permutation z" );
    bool test2 = palindromePermutation( "thisisnotapermutation" );
    bool test3 = palindromePermutation( "TacocaT" ); // Trailing whitespace
    std::cout << "Test 1 : ( 1 expected )" << std::endl;
