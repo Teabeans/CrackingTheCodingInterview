@@ -69,6 +69,8 @@ then the string can be configured as a palindrome.
 3) At the conclusion of the scan, if the tally is greater than 1, no palindrome
   can be derived from the original string
 
+
+
 //-----------------------------------------------------------------------------|
 // TIME COMPLEXITY
 //-----------------------------------------------------------------------------|
