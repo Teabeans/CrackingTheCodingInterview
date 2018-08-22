@@ -5,7 +5,7 @@
 // Tim Lum
 // twhlum@gmail.com
 // Created:  2018.07.15
-// Modified: 2018.08.15
+// Modified: 2018.08.22
 //
 
 /*
@@ -89,6 +89,7 @@ Return the new (compressed) string.
     - Appendations, changes, concatenations are performed in O(1) time
 
 
+
 //-----------------------------------------------------------------------------|
 // TIME COMPLEXITY
 //-----------------------------------------------------------------------------|
@@ -121,11 +122,20 @@ If compression is worthwhile
 // CODE (C++)
 //-----------------------------------------------------------------------------|
 */
+// Compile with:
+// $ g++ --std=c++11 01_06_StringCompression.cpp -o StringCompression
+// Run with:
+// $ ./StringCompression
 
 #include <string>
+#include <sstream>
+#include <iostream>
+
+int countSavings( int* charCount, int length );
+std::string stitchStrings(char* charSequence, int* charCount, int origLength);
 
 // (+) --------------------------------|
-// #stringCompression(string)
+// #stringCompression( std::string )
 // ------------------------------------|
 // Desc:    Compresses a string if doing so would be beneficial, otherwise
 //          returns string unaltered
@@ -133,18 +143,18 @@ If compression is worthwhile
 // PreCons: None
 // PosCons: The string has been compressed (or nothing)
 // RetVal:  string - A compressed string (or not)
-string stringCompression( string theString ) {
+std::string stringCompression( std::string theString ) {
    // No savings can be realized on a string of length 2 or less
-   if (theString.length( ) < 3) {
+   if( theString.length( ) < 3 ) {
       return ( theString );
    }
 
    // Pack the string to two arrays
    // Declare storage
-   char[ ] charSequence = char[ theString.length( ) ];
-   int[ ]  charCount    =  int[ thestring.length( ) ];
+   char charSequence[ theString.length( ) ];
+   int  charCount[ theString.length( ) ];
    // Initialize storage
-   for ( int i = 0 ; i < theString.length( ) ; i++ ) {
+   for( int i = 0 ; i < theString.length( ) ; i++ ) {
       charSequence[ i ] = ( char )0;
       charCount[ i ] = -1;
    }
@@ -152,16 +162,16 @@ string stringCompression( string theString ) {
    int currArrayPos = 0;
 
    // Fencepost problem
-   char currChar = theString.at( i );
+   char currChar = theString.at( 0 );
    int counter = 1;
    charSequence[ currArrayPos ] = currChar;
 
-   for ( int i = 1 ; i < theString.length( ) ; i++ ) {
-      if ( currChar = theString.at( i ) ) {
+   for( int i = 1 ; i < theString.length( ) ; i++ ) {
+      if( currChar == theString.at( i ) ) {
          // Repeat behavior
          counter++;
       }
-      else if ( currChar != theString.at( i ) ) {
+      else if( currChar != theString.at( i ) ) {
          // Non-repeat behavior (new char)
          // Place the count of prior repetitions to the tracking arrays
          charCount[ currArrayPos ] = counter;
@@ -172,32 +182,44 @@ string stringCompression( string theString ) {
          // And reset the counter
          counter = 1;
       }
-   }
-   
+   } // Closing for - All chars counted
+   // Append the final counter value
+   charCount[ currArrayPos] = counter;
+
    // String traversed, determine savings
 
-   int savings = countSavings( charCount, theString.length() );
+   int savings = countSavings( charCount, theString.length( ) );
 
    // If no savings are realized, return the original string
-   if ( savings < 1 ) {
-      return ( theString );
+   if( savings < 1 ) {
+      return( theString );
    }
 
    // Otherwise, concatenate a new string
-   else if ( savings >= 1 ) {
-      retString = stitchStrings(charSequence, charCount, theString.length());
+   else {
+      std::string retString = stitchStrings( charSequence, charCount, theString.length( ) );
+      // Return the compressed string
+      return( retString );
    }
-   // Return the compressed string
-   return ( retString );
 
-} // Closing stringCompression()
+} // Closing stringCompression( std::string )
 
-int countSavings( int[] charCount, int length ) {
+// (+) --------------------------------|
+// #countSavings( std::string )
+// ------------------------------------|
+// Desc:    Compresses a string if doing so would be beneficial, otherwise
+//          returns string unaltered
+// Params:  int[] arg1 - An loaded array of char counts
+//          int arg2 - The original string length
+// PreCons: None
+// PosCons: None
+// RetVal:  int - The anticipated savings of a compression action
+int countSavings( int* charCount, int length ) {
    // For every element in the count array...
    int savings = 0;
-   for ( int i = 0 ; i < length ; i++ ) {
+   for( int i = 0 ; i < length ; i++ ) {
       // If we run off the end of the valid numerics...
-      if ( charCount[ i ] == -1 ) {
+      if( charCount[ i ] == -1 ) {
          break;
       }
       else {
@@ -214,18 +236,59 @@ int countSavings( int[] charCount, int length ) {
          savings = savings - powersOfTen;
       }
    } // Closing for, all valid numerics added correctly to "savings"
-   return ( savings );
-} // Closing countSavings()
+   return( savings );
+} // Closing countSavings( int*, int )
 
-string stitchStrings(char* charSequence, int* charCount, int origLength) {
-   stringstream tempStream;
-   for ( int i = 0 ; i < origLength ; i++ ) {
+// (+) --------------------------------|
+// #stitchStrings( char*, int*, int )
+// ------------------------------------|
+// Desc:    Concatenates all compressed string segments
+// Params:  char* arg1 - The sequence of characters as they appeared
+//          int* arg2 - The count of the character repetitions
+//          int arg3 - The original length of the string
+// PreCons: None
+// PosCons: None
+// RetVal:  std::string - The concatenated string sequence
+std::string stitchStrings(char* charSequence, int* charCount, int origLength) {
+   std::stringstream tempStream;
+   for( int i = 0 ; i < origLength ; i++ ) {
       // In the event of an invalid char count, stop
-      if (charCount[i] == -1) {
+      if( charCount[ i ] == -1 ) {
          break;
       }
       // Otherwise, concatenate
-      tempStream << charSequence[i] << charCount[i];
+      tempStream << charSequence[ i ] << charCount[ i ];
    } // Closing for - Valid concatenations complete
-   return (tempStream.toString());
+   return( tempStream.str( ) );
 } // Closing stitchStrings()
+
+
+
+//-----------------------------------------------------------------------------|
+// DRIVER
+//-----------------------------------------------------------------------------|
+
+// (+) --------------------------------|
+// #main( int, char* )
+// ------------------------------------|
+// Desc:    Code driver
+// Params:  int arg1 - The number of command line arguments passed in
+//          char* arg2 - The content of the command line arguments
+// PreCons: None
+// PosCons: None
+// RetVal:  int - The exit code (0 for normal, -1 for error)
+int main( int argc, char* argv[ ] ) {
+   std::cout << "Test of stringCompression( )" << std::endl;
+   std::string test1 = stringCompression( "AAABBBCCCDDD" );
+   std::string test2 = stringCompression( "ABCDEFG" );
+   std::string test3 = stringCompression( "AAABBCCD" );
+   std::cout << "Test 1 : ( 'A3B3C3D3' expected )" << std::endl;
+   std::cout << "            " << test1 << std::endl << std::endl;
+   std::cout << "Test 2 : ( 'ABCDEFG' expected )" << std::endl;
+   std::cout << "            " << test2 << std::endl << std::endl;
+   std::cout << "Test 3 : ( 'AAABBCCD' expected )" << std::endl;
+   std::cout << "            " << test3 << std::endl << std::endl;
+   return( 0 );
+} // Closing main( int, char* )
+
+// End of file 01_06_StringCompression.cpp
