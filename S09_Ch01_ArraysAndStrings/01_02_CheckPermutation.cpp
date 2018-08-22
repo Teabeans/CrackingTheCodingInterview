@@ -5,19 +5,29 @@
 // Tim Lum
 // twhlum@gmail.com
 // Created:  2018.07.15
-// Modified: 2018.07.15
+// Modified: 2018.08.21
 //
 
 /*
 1.2 - CheckPermutation() - P.90
 Given two strings, write a method to decide if one is a permutation of the other.
 
-Problem Setup and Assumptions:
+
+
+//-----------------------------------------------------------------------------|
+// PROBLEM SETUP AND ASSUMPTIONS
+//-----------------------------------------------------------------------------|
+
   A string may be represented as an array or linked list of chars.
     Many languages also support the string as a class
   A permutation is a rearrangement of characters in a string.
 
-Naive Approach:
+
+
+//-----------------------------------------------------------------------------|
+// NAIVE, BRUTE FORCE, TERRIBAD APPROACH
+//-----------------------------------------------------------------------------|
+
   Compare all permutations of one string against the other for equivalence.
   The time complexity may be represented by the number of comparisons required based on N, the length of the strings.
   As a string of length N will in the worst case require a quantity of comparisons matching the number of permutations available, the pattern will be as follows:
@@ -31,7 +41,12 @@ Naive Approach:
   O(N! * N)
   Note that this ignores issues of repeated characters or discussions of alphabet size.
 
-Optimizations:
+
+
+//-----------------------------------------------------------------------------|
+// OPTIMIZATIONS
+//-----------------------------------------------------------------------------|
+
   1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
   2) Sorting the two strings (an O(NlogN) operation) may allow us to traverse the sorted strings char-by-char looking for discrepancies.
     - To be permutations, the quantity of all characters must be the same
@@ -52,7 +67,18 @@ Optimizations:
       - O(N) to traverse the second string
       - Which simplifies to an O(N) time complexity for this solution
 
-Pseudo Logic:
+
+
+//-----------------------------------------------------------------------------|
+// TIME COMPLEXITY
+//-----------------------------------------------------------------------------|
+
+
+
+//-----------------------------------------------------------------------------|
+// PSEUDOLOGIC
+//-----------------------------------------------------------------------------|
+
   Compare string lengths for equality
   Declare alphabet table charCounts
   For each character in string1
@@ -62,10 +88,15 @@ Pseudo Logic:
     If the result is <0
       Return false
 
-Code (C++):
+
+
+//-----------------------------------------------------------------------------|
+// CODE (C++)
+//-----------------------------------------------------------------------------|
 */
 
 #include <string>
+#include <iostream>
 
 // (+) --------------------------------|
 // #checkPermutations(string)
@@ -113,3 +144,25 @@ bool checkPermutations(string string1, string string2) {
    // No discrepancies found in the two strings, so...
    return( true );
 }
+
+// (+) --------------------------------|
+// #main( int, char* )
+// ------------------------------------|
+// Desc:    Code driver
+// Params:  int arg1 - The number of command line arguments passed in
+//          char* arg2 - The content of the command line arguments
+// PreCons: None
+// PosCons: None
+// RetVal:  int - The exit code (0 for normal, -1 for error)
+int main( int argc, char* argv[ ] ) {
+   std::cout << "Test of checkPermutations( )" << std::endl;
+   bool test1 = checkPermutations( "abcdefghijklmnop", "ponmlkjihgfedcba" );
+   bool test2 = checkPermutations( "abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyy" );
+   bool test3 = checkPermutations( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 " );
+   std::cout << "Test 1 (expected: 1) : " << test1 << std::endl;
+   std::cout << "Test 2 (expected: 0) : " << test2 << std::endl;
+   std::cout << "Test 3 (expected: 1) : " << test3 << std::endl;
+   return( 0 );
+} // Closing main( int, char* )
+
+// End of file 01_02_checkPermutations.cpp
