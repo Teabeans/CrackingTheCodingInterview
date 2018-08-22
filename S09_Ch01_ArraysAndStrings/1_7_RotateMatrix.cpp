@@ -5,22 +5,66 @@
 // Tim Lum
 // twhlum@gmail.com
 // Created:  2018.07.15
-// Modified: 2018.07.15
+// Modified: 2018.08.22
 //
 
 NOTE: PLACEHOLDER DOCUMENT! TODO: Complete problem
 
 /*
-1.2 - CheckPermutation() - P.90
-Given two strings, write a method to decide if one is a permutation of the other.
+1.7 - RotateMatrix() - P.91
+Given an image represented by an NxN matrix, where each pixel in the image is 4
+bytes, write a method to rotate the image by 90 degrees.
 
-Problem Setup and Assumptions:
-  A string may be represented as an array or linked list of chars.
-    Many languages also support the string as a class
-  A permutation is a rearrangement of characters in a string.
+Can you do this in place?
 
-Naive Approach:
-  Compare all permutations of one string against the other for equivalence.
+//-----------------------------------------------------------------------------|
+// PROBLEM SETUP AND ASSUMPTIONS
+//-----------------------------------------------------------------------------|
+
+  A left rotation may be performed by calling a right rotation 3 times.
+    Only the right (clockwise) rotation shall be handled
+  The nature of the pixel is immaterial; we may handle the pixel as a 32-bit int
+  Since the problem specifies an N x N matrix, we address a square aspect ratio
+
+  To move a pixel
+
+     0   1    X         0   1    X
+   +---+---+          +---+---+     ([0][0] becomes [1][0])
+0  | 1 | 2 |       0  | 4 | 1 |     ([1][0] becomes [1][1])
+   +---+---+          +---+---+
+1  | 4 | 3 |       1  | 3 | 2 |
+   +---+---+          +---+---+
+Y                  Y
+
+
+
+//-----------------------------------------------------------------------------|
+// NAIVE APPROACH
+//-----------------------------------------------------------------------------|
+
+  Iterate across every pixel within a quadrant and for (4) times
+    Identify the 4 sister-pixels
+
+     0   1   2    X    [X][Y]               is sister to
+   +---+---+---+       [XMax - X][Y]        which is sister to
+0  | 1 | 2 | 3 |       [XMax - X][YMax - Y] which is sister to
+   +---+---+---+       [X][YMax-Y]
+1  | 8 | 9 | 4 |
+   +---+---+---+
+2  | 7 | 6 | 5 |
+   +---+---+---+
+Y
+
+    There are two special cases;
+      In an odd-numbered array, the center column and row exhibit:
+        [X][Y]      is sister to
+        [YMax-Y][X] which is sister to
+        [X][YMax-Y] which is sister to
+        [Y][X]
+
+      And the center
+        [1/2X][1/2Y] has no sibling
+
   The time complexity may be represented by the number of comparisons required based on N, the length of the strings.
   As a string of length N will in the worst case require a quantity of comparisons matching the number of permutations available, the pattern will be as follows:
     (1) char  == 1 combination  (a)
@@ -33,26 +77,17 @@ Naive Approach:
   O(N! * N)
   Note that this ignores issues of repeated characters or discussions of alphabet size.
 
-Optimizations:
-  1) If the string size is an O(1) accessible field, it may be checked first. Any strings with differing lengths may bypass comparisons; they cannot be permutations of each other.
-  2) Sorting the two strings (an O(NlogN) operation) may allow us to traverse the sorted strings char-by-char looking for discrepancies.
-    - To be permutations, the quantity of all characters must be the same
-    - So if a mismatch is found in the sorted sequence, the quantities differ and the strings cannot be permutations of each other
-  3) However, since we only require a count of the characters involved, we can avoid sorting the strings and merely take a tally
-    - 2 tables will be required representing the frequency of characters within each string
-    - After traversing the string to populate these frequency tables, we can compare the tables for discrepancies
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - O(A) to traverse the frequency table (where A represent the length of the alphabet)
-    - This has the additional advantage that the strings need not be modified or copied
-  4) A single frequency table may be used by counting up for the first string, then down for the second. This yields a couple advantages:
-    - A slight improvement to memory requirements of the frequency table, as only one alphabet need be stored.
-    - The algorithm may shortcut its comparisons if the decrement value ever drops below 0 (representing more of that character in the second string than the first)
-    - The time complexity may be represented as:
-      - O(N) to traverse the first string
-      - O(N) to traverse the second string
-      - Which simplifies to an O(N) time complexity for this solution
+
+
+//-----------------------------------------------------------------------------|
+// OPTIMIZATIONS
+//-----------------------------------------------------------------------------|
+
+  1) The orientation of the image may be stored as a separate value from 0 to 3.
+     This may then be used to interpret the N, E, S, W orientation of the image
+     without modifying the image itself.
+
+
 
 Pseudo Logic:
   Compare string lengths for equality
