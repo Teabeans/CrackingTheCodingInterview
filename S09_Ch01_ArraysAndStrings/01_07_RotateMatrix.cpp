@@ -143,7 +143,7 @@ O( 1 )
 #include <iostream>
 #include <iomanip>
 
-#define WIDTH  7
+#define WIDTH  3
 #define HEIGHT 7
 
 // Rotation control:
@@ -167,36 +167,38 @@ void printMatrix( ) {
    int xDim = WIDTH;
    int yDim = HEIGHT;
    if( ROTATION == 0 ) {
-      for( int row = 0 ; row < xDim ; row++ ) {
-         for( int col = 0 ; col < yDim; col++ ) {
-            std::cout << std::setw( 3 ) << IMAGE[ row ][ col ] << " ";
+      // For rows 0 to MAX...
+      for( int row = 0 ; row < yDim ; row++ ) {
+         // Print column 0 to MAX
+         for( int col = 0 ; col < xDim; col++ ) {
+            std::cout << std::setw( 3 ) << IMAGE[ col ][ row ] << " ";
          }
          std::cout << std::endl << std::endl;
       }
    }
 
    else if( ROTATION == 1 ) {
-      for( int col = 0 ; col < yDim ; col++ ) {
-         for( int row = ( xDim - 1 ) ; row >= 0; row-- ) {
-            std::cout << std::setw( 3 ) << IMAGE[ row ][ col ] << " ";
+      for( int col = 0 ; col < xDim ; col++ ) {
+         for( int row = ( yDim - 1 ) ; row >= 0; row-- ) {
+            std::cout << std::setw( 3 ) << IMAGE[ col ][ row ] << " ";
          }
          std::cout << std::endl << std::endl;
       }
    }
 
    else if ( ROTATION == 2 ) {
-      for( int row = xDim-1 ; row >= 0 ; row-- ) {
-         for( int col = ( yDim - 1 ) ; col >= 0 ; col-- ) {
-            std::cout << std::setw( 3 ) << IMAGE[ row ][ col ] << " ";
+      for( int row = yDim-1 ; row >= 0 ; row-- ) {
+         for( int col = ( xDim - 1 ) ; col >= 0 ; col-- ) {
+            std::cout << std::setw( 3 ) << IMAGE[ col ][ row ] << " ";
          }
          std::cout << std::endl << std::endl;
       }
    }
 
    else if ( ROTATION == 3 ) {
-      for( int col = ( yDim - 1 ) ; col >= 0 ; col-- ) {
-         for( int row = 0 ; row < xDim ; row++ ) {
-            std::cout << std::setw( 3 ) << IMAGE[ row ][ col ] << " ";
+      for( int col = ( xDim - 1 ) ; col >= 0 ; col-- ) {
+         for( int row = 0 ; row < yDim ; row++ ) {
+            std::cout << std::setw( 3 ) << IMAGE[ col ][ row ] << " ";
          }
          std::cout << std::endl << std::endl;
       }
@@ -235,9 +237,10 @@ int main( int argc, char* argv[ ] ) {
    int xDim = WIDTH;
    int yDim = HEIGHT;
 
+   // For row 0 to MAX
    for( int row = 0 ; row < yDim ; row++ ) {
       for( int col = 0 ; col < xDim ; col++ ) {
-         IMAGE[ row ][ col ] = ( xDim * row ) + col;
+         IMAGE[ col ][ row ] = ( xDim * row ) + col;
       }
    }
    printMatrix( );
