@@ -88,7 +88,14 @@ Is
    This may then be used to interpret the N, E, S, W orientation of the image
    without modifying the image itself.
 
-Effectively, we may interject an orientation filter
+Effectively, we may interject an orientation filter which appropriately redirects
+array access based upon the rotational state of the image.
+
+This has the added benefit of functioning on non-square arrays, and also facilitates
+easy addition of -90 and 180 degree rotations.
+
+From an image editing standpoint, interpretation rather than alteration of the base
+data will also better preserve image information.
 
 
 
