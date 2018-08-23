@@ -162,36 +162,36 @@ void printMatrix( ) {
    if( ROTATION == 0 ) {
       for( int row = 0 ; row < xDim ; row++ ) {
          for( int col = 0 ; col < yDim; col++ ) {
-            std::cout << std::setw(2) << IMAGE[ row ][ col ] << " ";
+            std::cout << std::setw( 3 ) << IMAGE[ row ][ col ] << " ";
          }
-         std::cout << std::endl;
+         std::cout << std::endl << std::endl;
       }
    }
 
    else if( ROTATION == 1 ) {
       for( int col = 0 ; col < yDim ; col++ ) {
-         for( int row = xDim-1 ; row >= 0; row-- ) {
-            std::cout << std::setw(2) << IMAGE[ row ][ col ] << " ";
+         for( int row = ( xDim - 1 ) ; row >= 0; row-- ) {
+            std::cout << std::setw( 3 ) << IMAGE[ row ][ col ] << " ";
          }
-         std::cout << std::endl;
+         std::cout << std::endl << std::endl;
       }
    }
 
    else if ( ROTATION == 2 ) {
       for( int row = xDim-1 ; row >= 0 ; row-- ) {
-         for( int col = yDim-1 ; col >= 0 ; col-- ) {
-            std::cout << std::setw(2) << IMAGE[ row ][ col ] << " ";
+         for( int col = ( yDim - 1 ) ; col >= 0 ; col-- ) {
+            std::cout << std::setw( 3 ) << IMAGE[ row ][ col ] << " ";
          }
-         std::cout << std::endl;
+         std::cout << std::endl << std::endl;
       }
    }
 
    else if ( ROTATION == 3 ) {
-      for( int col = yDim-1 ; col >= 0 ; col-- ) {
-         for( int row = 0 ; row < xDim; row++ ) {
-            std::cout << std::setw(2) << IMAGE[ row ][ col ] << " ";
+      for( int col = ( yDim - 1 ) ; col >= 0 ; col-- ) {
+         for( int row = 0 ; row < xDim ; row++ ) {
+            std::cout << std::setw( 3 ) << IMAGE[ row ][ col ] << " ";
          }
-         std::cout << std::endl;
+         std::cout << std::endl << std::endl;
       }
    }
 }
@@ -237,21 +237,25 @@ int main( int argc, char* argv[ ] ) {
 
    std::cout << std::endl;
 
+   std::cout << "Rotating..." << std::endl << std::endl;
    rotateMatrix( );
    printMatrix( );
 
    std::cout << std::endl;
 
+   std::cout << "Rotating..." << std::endl << std::endl;
    rotateMatrix( );
    printMatrix( );
 
    std::cout << std::endl;
 
+   std::cout << "Rotating..." << std::endl << std::endl;
    rotateMatrix( );
    printMatrix( );
 
    std::cout << std::endl;
 
+   std::cout << "Rotating..." << std::endl << std::endl;
    rotateMatrix( );
    printMatrix( );
 
