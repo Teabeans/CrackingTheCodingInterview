@@ -119,14 +119,10 @@ O( 1 )
 //-----------------------------------------------------------------------------|
 // PSEUDOLOGIC
 //-----------------------------------------------------------------------------|
-  Compare string lengths for equality
-  Declare alphabet table charCounts
-  For each character in string1
-    Add 1 to the appropriate table in charCounts
-  For each character in string2
-    Subtract 1 from the appropriate table in charCounts
-    If the result is <0
-      Return false
+
+For every call to rotate, add 1 to the rotation state.
+For a call to display the image, read across the rows and columns in an
+  appropriate fashion.
 
 
 
