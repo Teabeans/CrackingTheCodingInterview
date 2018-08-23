@@ -207,7 +207,7 @@ void printMatrix( ) {
 // Desc:    Rotates a matrix
 // Params:  None
 // PreCons: None
-// PosCons: None
+// PosCons: The rotation has been incremented
 // RetVal:  None
 void rotateMatrix( ) {
    ROTATION = ( ROTATION + 1 ) % 4;
