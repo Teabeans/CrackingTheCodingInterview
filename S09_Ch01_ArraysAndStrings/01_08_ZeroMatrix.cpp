@@ -5,7 +5,7 @@
 // Tim Lum
 // twhlum@gmail.com
 // Created:  2018.08.23
-// Modified: 2018.08.27
+// Modified: 2018.08.28
 //
 
 /*
@@ -116,7 +116,7 @@ This suggests that there is a preferential order by which to check the squares:
 
 A description of this sequence may be as follows:
 
-Scan from left to right, top to bottom until a 0 is encountered.
+1st Priority: Scan from left to right, top to bottom until a 0 is encountered.
 
 X  X  X  X  X  X  X  X  X
 X  X  X  0  -  -  -  -  - <- Hit!
@@ -153,8 +153,9 @@ X  0  -  -  -  -  -  -  -
 -  -  X  -  X  -  0  -  - <- Hit!
 -  -  X  -  X  0  -  -  - <- Not discovered
 
-Return to the first 0-cell
-Then read those cells in line that do not share a Y coordinate
+Second Priority: Return to the first 0-cell
+Then read those cells in line that do not share a Y coordinate with a previously
+discovered 0-cell
 
 X  X  X  X  X  X  X  X  X
 X  X  X  0  X  -  -  -  -
@@ -179,7 +180,8 @@ every square needed to be examined to arrive at the solution.
  0  0  0  0  0  0 (0) 0  0
  0  0  0  0  0 (0) 0  0  0
 
-The best-case scenario for this search algorithm is a descending diagonal:
+The best-case scenario for this search algorithm is any matrix state which
+contains a descending diagonal:
 
 0  -  -  -  -  -  -  -  -
 -  0  -  -  -  -  -  -  -
@@ -235,7 +237,7 @@ Index    Col   Row
 8        -     -
 
 Note that the above table does not inform a reader of whether 0:0, 4:5, 0:5, or 4:0
-are the original 0s. Note also that the end result does not differ.
+are the original 0-cells. Note also that the end result does not differ.
 
 The writing portion may experience similar efficiencies as the read portion,
 again by use of a list.
@@ -254,9 +256,10 @@ re-write to that row (or vice versus if the columns are tared first).
 -  0  -  -  -  -  -  -  -
    ^- Writing this column afterwards, it may skip row 1
 
-If all the rows are written first, a list may be built simultaneously
-to inform what cells the column writes must finish. For instance,
-if our observation table was this:
+If all the rows are written first, a list may be built simultaneously with the
+row writes to inform what cells the column writes must tare. For instance, if the
+state of our observation table was as follows, we can make the following
+observations as the rows are iterated over and tared:
 
 [i]   Col   Row
 0     X     X
@@ -271,8 +274,8 @@ if our observation table was this:
 
 List contents: 2 - 5 - 8
 
-This process will result in the minimal number of cells that column writes must
-handle.
+This process will result in the minimal number of cells that the column writes
+must handle.
 
 Critically, this write methodology ensures that no rewrites will occur, with one
 exception.
@@ -298,7 +301,8 @@ O( n^2 )
 
 However, this leads to the best-case write on the order of:
 
-O( 1 ) - The list of writeable rows and columns is 0, no writes occur
+O( n ) - The list of writeable rows and columns is 0, no writes occur, although
+it requires 2n scans of the row/column tally to confirm this.
 
 The best-case read (diagonal 0-cells discovered) may be accomplished on the order of:
 
@@ -317,13 +321,70 @@ O( n^2 )
 |--------------------------------------|
 | READ:
 |--------------------------------------|
+1ST PRIORITY
+For each row
+  Check prime columns
+    If a 0-cell is found, mark its coordinates in the tally table
+    Remove this column from list of prime columns
+    break
+Rows completed
+   -  P  -  -  -  P  P  P - Prime   Col
+-  X  X  X  X  0  ?  ?  ?           4
+P  X  X  X  X  ?  X  X  X           -
+-  X  X  0  ?  ?  ?  ?  ?           2
+P  X  X  ?  X  ?  X  X  X           -
+-  0  ?  ?  ?  ?  ?  ?  ?           0
+P  ?  X  ?  X  ?  X  X  X           -
+-  ?  X  ?  0  ?  ?  ?  ?           3
+P  ?  X  ?  ?  ?  X  X  X           -
 
+   4  -  2  6  0  -  -  -
 
+2ND PRIORITY
+For every row where a 0-cell was found
+  Read prime columns from highest index back to 0-cell
 
+   -  P  -  -  -  P  P  P - Prime   Col
+-  X  X  X  X  0  X  X  X           4
+P  X  X  X  X  ?  X  X  X           -
+-  X  X  0  -  -  X  X  X           2
+P  X  X  ?  X  ?  X  X  X           -
+-  0  X  -  -  -  X  X  X           0
+P  ?  X  ?  X  ?  X  X  X           -
+-  ?  X  -  0  -  X  X  X           3
+P  ?  X  ?  ?  ?  X  X  X           -
+
+   4  -  2  6  0  -  -  -
+
+3RD PRIORITY
+For every column where a 0-cell was found
+  Read prime rows from highest index back to 0-cell
+
+   -  P  -  -  -  P  P  P - Prime   ColHits
+-  X  X  X  X  0  X  X  X           4
+P  X  X  X  X  X  X  X  X           -
+-  X  X  0  -  -  X  X  X           2
+P  X  X  X  X  X  X  X  X           -
+-  0  X  -  -  -  X  X  X           0
+P  X  X  X  X  X  X  X  X           -
+-  ?  X  -  0  -  X  X  X           3
+P  X  X  X  X  X  X  X  X           -
+
+P  4  -  2  6  0  -  -  - RowHits
+r
+i
+m
+e
 
 |--------------------------------------|
 | WRITE:
 |--------------------------------------|
+For every writable row
+  Tare the row
+  Remove the row from the writable column
+For every writable column
+  Tare the remaining elements
+
 
 
 //-----------------------------------------------------------------------------|
@@ -337,27 +398,30 @@ O( n^2 )
 
 #include <string>
 #include <iostream>
-#include <queue>
+#include <iomanip> // For setw
+#include <random> // For random number generation
 
-#define WIDTH
-#define HEIGHT
+#define WIDTH 10
+#define HEIGHT 10
 
 int MATRIX[ WIDTH ][ HEIGHT];
 
 // (+) --------------------------------|
-// #printArray( )
+// #printMatrix( )
 // ------------------------------------|
 // Desc:    Print a matrix
 // Params:  None
 // PreCons: None
 // PosCons: None
 // RetVal:  None
-void printArray( ) {
+void printMatrix( ) {
+   int yDim = HEIGHT;
+   int xDim = WIDTH;
    // For rows 0 to MAX...
    for( int row = 0 ; row < yDim ; row++ ) {
       // Print column 0 to MAX
       for( int col = 0 ; col < xDim; col++ ) {
-         std::cout << std::setw( 3 ) << IMAGE[ col ][ row ] << " ";
+         std::cout << std::setw( 3 ) << MATRIX[ col ][ row ] << " ";
       }
       std::cout << std::endl << std::endl;
    }
@@ -372,8 +436,47 @@ void printArray( ) {
 // PosCons: None
 // RetVal:  None
 void zeroMatrix( ) {
-   ROTATION = ( ROTATION + 1 ) % 4;
-}
+   // READ
+   // Generate tally arrays and initialize them to false
+   bool rowContainsZero[HEIGHT];
+   for( int i = 0 ; i < HEIGHT ; i++ ) {
+      rowContainsZero[i] = false;
+   }
+   bool colContainsZero[WIDTH];
+   for( int i = 0 ; i < WIDTH ; i++ ) {
+      colContainsZero[i] = false;
+   }
+
+   // For every row...
+   for( int y = 0 ; y < HEIGHT ; y++ ) {
+      // Check each column cell for a zero
+      for( int x = 0 ; x < WIDTH ; x++ ) {
+         if( MATRIX[x][y] == 0 ) {
+            rowContainsZero[y] = true;
+            colContainsZero[x] = true;
+         }
+      }
+   } // Closing for - Matrix scanned, row and col tallies loaded
+
+   // WRITE
+   // Write all columns
+   for( int x = 0 ; x < WIDTH ; x++ ) {
+      if( colContainsZero[x] == true ) {
+         for( int y = 0 ; y < HEIGHT ; y++ ) {
+            MATRIX[x][y] = 0;
+         }
+      }
+   } // Closing for - All columns zeroed
+
+   // Write all rows
+   for( int y = 0 ; y < HEIGHT ; y++ ) {
+      if( rowContainsZero[y] == true ) {
+         for( int x = 0 ; x < WIDTH ; x++ ) {
+            MATRIX[x][y] = 0;
+         }
+      }
+   } // Closing for - All rows zeroed
+} // Closing zeroMatrix()
 
 
 
@@ -391,43 +494,24 @@ void zeroMatrix( ) {
 // PosCons: None
 // RetVal:  int - The exit code (0 for normal, -1 for error)
 int main( int argc, char* argv[ ] ) {
-   std::cout << "Test of rotateMatrix( )" << std::endl;
+   std::cout << "Test of zeroMatrix( )" << std::endl;
    int xDim = WIDTH;
    int yDim = HEIGHT;
 
    // For row 0 to MAX
    for( int row = 0 ; row < yDim ; row++ ) {
       for( int col = 0 ; col < xDim ; col++ ) {
-         IMAGE[ col ][ row ] = ( xDim * row ) + col;
+         MATRIX[ col ][ row ] = ( rand( ) % 20 );
       }
    }
    printMatrix( );
 
-   std::cout << std::endl;
+   std::cout << "ZeroMatrix()..." << std::endl << std::endl;
+   zeroMatrix( );
 
-   std::cout << "Rotating..." << std::endl << std::endl;
-   rotateMatrix( );
-   printMatrix( );
-
-   std::cout << std::endl;
-
-   std::cout << "Rotating..." << std::endl << std::endl;
-   rotateMatrix( );
-   printMatrix( );
-
-   std::cout << std::endl;
-
-   std::cout << "Rotating..." << std::endl << std::endl;
-   rotateMatrix( );
-   printMatrix( );
-
-   std::cout << std::endl;
-
-   std::cout << "Rotating..." << std::endl << std::endl;
-   rotateMatrix( );
    printMatrix( );
 
    return( 0 );
 } // Closing main( int, char* )
 
-// End of file 01_07_RotateMatrix.cpp
+// End of file 01_08_ZeroMatrix.cpp
