@@ -29,8 +29,26 @@
 //-----------------------------------------------------------------------------|
 //
 // Implementation file for a Linked List class, for use with Chapter 2 of
-// 'Cracking the Coding Interview'
+// 'Cracking the Coding Interview'. Contains both a Linked List Node (nodeLL)
+// structure and a Linked List (LinkedList) structure.
 //
+// A nodeLL contains:
+//   bool isSentinel - Denotes the first node in the list
+//   nodeLL* next
+//   nodeLL* prev
+//   int val
+//
+// A LinkedList contains:
+//   nodeLL head - Denotes the head or handle on the Linked List
+//   int length
+//   int insert( int val ) - Insert a new node with given value at end of list
+//   int insertAfter( int val, nodeLL* tgt ) - Insert a new node after the target
+//   int insertBefore( int val, nodeLL* tgt ) - Insert a new node before the target
+//   int remove( int val ) - Remove the first node bearing the target value
+//   nodeLL* find( int val ) - Locates the first node bearing the target value
+//   void print( ) - Prints the Linked List to console
+//   std:string toString( ) - Returns the Linked List as a string representation
+//   
 
 //-----------------------------------------------------------------------------|
 // PACKAGE FILES
@@ -92,7 +110,7 @@ struct nodeLL {
 //-------------------------------------|
    nodeLL( ) {
       this->isSentinel = false;
-      this->value = NULL;
+      this->value = -1;
       this->next = nullptr;
       this->prev = nullptr;
    }
@@ -111,24 +129,24 @@ struct nodeLL {
       this->value = val;
       // Set the four relevant pointers to the correct targets
       this->next = next;
-      this->next.prev = this;
+      this->next->prev = this;
       this->prev = prev;
-      this->prev.next = this;
+      this->prev->next = this;
    }
 
 //-------------------------------------|
    ~nodeLL( ) {
       this->isSentinel = NULL;
-      this->value = NULL;
+      this->value = -1;
       this->next = nullptr;
       this->prev = nullptr;
    }
-} // Closing struct nodeLL
+}; // Closing struct nodeLL
 
 //-------------------------------------|
 struct LinkedList {
 //-------------------------------------|
-   nodeLL head;
+   nodeLL* head;
    int length;
 
    int insert( int val );
@@ -137,35 +155,39 @@ struct LinkedList {
    int remove( int val );
    nodeLL* find( int val );
    void print( );
-   std:string toString( );
+   std::string toString( );
 
 //-------------------------------------|
    LinkedList( ) {
-      head.next = this;
-      head.prev = this;
-      head.value = NULL;
-      head.isSentinel = true;
+      this->head = new nodeLL();
+      head->next = this->head;
+      head->prev = this->head;
+      head->value = -1;
+      head->isSentinel = true;
       length = 0;
    }
 
 //-------------------------------------|
    ~LinkedList( ) {
       nodeLL* prevNode;
-      nodeLL* currNode = head->next;
+      nodeLL* currNode = this->head->next;
       while (currNode->isSentinel == false) {
          prevNode = currNode;
          currNode = currNode->next;
          delete prevNode;
       } // Closing while - We've returned to the sentinel
+      delete this->head;
       // Head is statically allocated, will delete when it leaves scope
    }
 
+}; // Closing struct LinkedList
+
 //-------------------------------------|
-   nodeLL* find( int searchVal ) {
+   nodeLL* LinkedList::find( int searchVal ) {
       nodeLL* retPtr = nullptr;
-      nodeLL* currNodePtr = this->head.next;
+      nodeLL* currNodePtr = this->head->next;
       for (int i = 0 ; i < length ; i++ ) {
-         if ( currNodePtr.value == searchVal ) {
+         if ( currNodePtr->value == searchVal ) {
             retPtr = currNodePtr;
             return( retPtr );
          }
@@ -174,17 +196,16 @@ struct LinkedList {
    }
 
 //-------------------------------------|
-   int insert( int val ) {
+   int LinkedList::insert( int val ) {
       // Generate the new node
-      nodeLL* newNode = nodeLL( val, this->head.prev, this->head );
-
+      nodeLL* newNode = new nodeLL( val, this->head->prev, this->head );
       // Insertion complete, increment the length
       this->length++;
       return( this->length );
    }
 
 //-------------------------------------|
-   int insertAfter( int val, nodeLL* tgt ) {
+   int LinkedList::insertAfter( int val, nodeLL* tgt ) {
       // Hold the target
       nodeLL* tgtNodePtr = this->find( val );
       if ( tgtNodePtr == nullptr ) {
@@ -195,7 +216,7 @@ struct LinkedList {
    }
 
 //-------------------------------------|
-   int insertBefore( int val, nodeLL* tgt ) {
+   int LinkedList::insertBefore( int val, nodeLL* tgt ) {
       // Hold the target
       nodeLL* tgtNodePtr = this->find( val );
       if ( tgtNodePtr == nullptr ) {
@@ -206,12 +227,12 @@ struct LinkedList {
    }
 
 //-------------------------------------|
-   void print( ) {
+   void LinkedList::print( ) {
       std::cout << this->toString( ) << std::endl;
    }
 
 //-------------------------------------|
-   int remove( int val ) {
+   int LinkedList::remove( int val ) {
       // Attempt to find the appropriate node for deletion
       nodeLL* tgtNodePtr = this->find( val );
       // If the value is not found, abort
@@ -220,12 +241,12 @@ struct LinkedList {
       }
       else {
          // Hold the nodes before and after the target
-         nodeLL* prevNodePtr = tgtNodePtr.next;
-         nodeLL* nextNodePtr = tgtNodePtr.prev;
+         nodeLL* prevNodePtr = tgtNodePtr->next;
+         nodeLL* nextNodePtr = tgtNodePtr->prev;
 
          // Redirect pointers around the target
-         prevNodePtr.next = nextNodePtr;
-         nextNodePtr.prev = prevNodePtr;
+         prevNodePtr->next = nextNodePtr;
+         nextNodePtr->prev = prevNodePtr;
 
          // Delete the target, decrement the length
          delete tgtNodePtr;
@@ -235,16 +256,27 @@ struct LinkedList {
    }
 
 //-------------------------------------|
-   std::string toString( ) {
-      stringstream tempStream;
+   std::string LinkedList::toString( ) {
+      std::stringstream tempStream;
       tempStream << "(HEAD)";
-      nodeLL* currNodePtr = this.head.next;
-      for ( int i = 0 ; i < this.length ; i++ ) {
-         tempStream << " - " << currNodePtr.value;
-         currNodePtr = currNodePtr.next;
+      nodeLL* currNodePtr = this->head->next;
+      for ( int i = 0 ; i < this->length ; i++ ) {
+         tempStream << " - " << currNodePtr->value;
+         currNodePtr = currNodePtr->next;
       }
    }
 
-} // Closing struct LinkedList
+//-----------------------------------------------------------------------------|
+// DRIVER
+//-----------------------------------------------------------------------------|
+
+// Note: Do not include when running: For compilation testing purposes only.
+
+/*
+int main() {
+   std::cout << "Hello, World!" << std::endl;
+   return( 1 );
+}
+*/
 
 // End of file - 02_00_LinkedList.cpp
