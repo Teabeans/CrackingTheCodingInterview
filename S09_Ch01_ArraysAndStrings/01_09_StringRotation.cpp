@@ -224,6 +224,8 @@ int main( int argc, char* argv[ ] ) {
    std::string tuple1_0 = "WATERBOTTLE";
    std::string tuple1_1 = "BOTTLEWATER";
 
+   std::cout << "Tuple1_0: " << tuple1_0 << std::endl;
+   std::cout << "Tuple1_1: " << tuple1_1 << std::endl;
    std::cout << "Tuple1_0 vs Tuple1_1 (1 expected):" << std::endl;
    bool judgement = stringRotation( tuple1_0, tuple1_1 );
    std::cout << judgement << std::endl << std::endl;
@@ -231,6 +233,8 @@ int main( int argc, char* argv[ ] ) {
    std::string tuple2_0 = "AGAMEMNON";
    std::string tuple2_1 = "HERCULES!";
 
+   std::cout << "Tuple2_0: " << tuple2_0 << std::endl;
+   std::cout << "Tuple2_1: " << tuple2_1 << std::endl;
    std::cout << "Tuple2_0 vs Tuple2_1 (0 expected):" << std::endl;
    judgement = stringRotation( tuple2_0, tuple2_1 );
    std::cout << judgement << std::endl << std::endl;
