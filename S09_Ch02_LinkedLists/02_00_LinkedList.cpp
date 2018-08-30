@@ -64,6 +64,15 @@
 // Include in other source code with
 // #include <02_00_LinkedList.cpp>
 //
+// For standalone compilation:
+// Un-comment method main() in the DRIVER section
+//
+// Compile with:
+// $ g++ --std=c++11 02_00_LinkedList.cpp -o LinkedList
+//
+// Run with:
+// $ ./LinkedList
+//
 
 //-----------------------------------------------------------------------------|
 // ERRATA
